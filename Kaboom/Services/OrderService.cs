@@ -79,7 +79,7 @@ namespace Kaboom.Services
             _context.Orders.Add(orders);
             _context.SaveChanges();
             //notify adminfor new orders
-            _orderHub.Clients.All.SendAsync("ReceiveNewOrder", orders.Id, user.UserName ?? admin.UserName);
+            _orderHub.Clients.All.SendAsync("ReceiveNewOrder", orders.Id, user?.UserName ?? admin.UserName);
             return orders;
 
             //new example for push
