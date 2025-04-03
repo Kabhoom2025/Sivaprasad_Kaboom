@@ -1,0 +1,6 @@
+@Kaboom_HostAddress = http://localhost:5190
+
+GET {{Kaboom_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
