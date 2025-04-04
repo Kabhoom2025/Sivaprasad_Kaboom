@@ -1,5 +1,6 @@
 ﻿using Kaboom.Interfaces;
 using Kaboom.Models.product;
+using Kaboom.Models.productModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -55,6 +56,14 @@ namespace Kaboom.Controllers
             if (!isDeleted)
                 return NotFound(new { Message = "Product not Found" });
             return Ok(new { Message = $"{isDeleted} Product Deleted Successfully" });
+        }
+        [HttpPatch("{productId}/AddStock")]
+        public IActionResult AddStock( [FromBody] UpdateStockRequest request)
+        {
+            var isUpdated = _productService.UpdateStock(request.ProductId, request.NewQuantity);
+            if (!isUpdated)
+                return NotFound(new { Message = "Product not Found" });
+            return Ok(new { Message = $"{isUpdated} Product Stock Updated Successfully"});
         }
     }
 }

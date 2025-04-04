@@ -1,6 +1,7 @@
 ﻿using Kaboom.Interfaces;
 using Kaboom.Models;
 using Kaboom.Models.product;
+using Kaboom.Models.StockModel;
 using MongoDB.Driver;
 
 namespace Kaboom.Services
@@ -71,6 +72,26 @@ namespace Kaboom.Services
 
             _context.SaveChanges();
             return existingProduct;
+        }
+
+        public bool UpdateStock(int productId, int newQuantity)
+        {
+            var product = _context.Products.Find(productId);
+            if(product == null)
+            {
+                return false;
+            }
+            product.ProductStock += newQuantity;
+            _context.Update(product);
+            var stockentry = new Stocks
+            {
+                ProductId = productId,
+                Quantity = product.ProductStock,
+                LastUpdated = DateTime.UtcNow
+            };
+            _context.Stocks.Update(stockentry);
+            _context.SaveChanges();
+            return true;
         }
     }
 }

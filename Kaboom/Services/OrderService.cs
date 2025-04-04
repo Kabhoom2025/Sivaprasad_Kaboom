@@ -1,6 +1,8 @@
 ﻿using Kaboom.Interfaces;
 using Kaboom.Models;
+using Kaboom.Models.Admin;
 using Kaboom.Models.Order;
+using Kaboom.Models.StockModel;
 using Kaboom.SignalR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +22,7 @@ namespace Kaboom.Services
         }
         public List<Orders> GetAllOrders()
         {
-           var data = _context.Orders.Include(o=>o.OrderItems).ToList();
+           var data = _context.Orders.Include(o=>o.OrderItems).ThenInclude(p=>p.Product).ToList();
             return data;
         }
 
@@ -62,7 +64,7 @@ namespace Kaboom.Services
                 }
                 if(product.ProductStock < item.Quantity)
                 {
-                    throw new Exception($"Not Enough stock for {product.ProductName}");
+                    throw new Exception($"Not Enough stock for {product.ProductName}. Available: {product.ProductStock}, Requested: {item.Quantity}");
                 }
                 decimal price = product.ProductPrice;
                 //Reduce Stock
@@ -73,13 +75,37 @@ namespace Kaboom.Services
                     Price = price ,
                     Quantity = item.Quantity,
                 });
+                orders.TotalAmount = orders.OrderItems.Sum(i => i.Price * i.Quantity);
+                //stocks
+                _context.Stocks.Add(new Stocks
+                {
+                    ProductId = product.Id,
+                    Quantity = product.ProductStock,
+                    LastUpdated = DateTime.UtcNow
+                });
                 //send realtime stock updates
                 _orderHub.Clients.All.SendAsync("ReceiveStockUpdate", product.Id, product.ProductStock);
+            }
+            if (orders.UserId.HasValue)
+            {
+                var userExists = _context.Users.Any(a => a.Id == orders.UserId.Value);
+                if (!userExists)
+                {
+                    throw new Exception($"User with ID {orders.UserId.Value} does not exist.");
+                }
+            }
+            if (orders.AdminId.HasValue)
+            {
+                var adminExists = _context.Admins.Any(a => a.Id == orders.AdminId.Value);
+                if (!adminExists)
+                {
+                    throw new Exception($"Admin with ID {orders.AdminId.Value} does not exist.");
+                }
             }
             _context.Orders.Add(orders);
             _context.SaveChanges();
             //notify adminfor new orders
-            _orderHub.Clients.All.SendAsync("ReceiveNewOrder", orders.Id, user?.UserName ?? admin.UserName);
+            _orderHub.Clients.All.SendAsync("ReceiveNewOrder", orders.Id, user?.UserName ?? admin?.UserName);
             return orders;
 
             //new example for push

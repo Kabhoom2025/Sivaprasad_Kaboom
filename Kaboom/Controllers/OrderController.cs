@@ -22,6 +22,10 @@ namespace Kaboom.Controllers
         public IActionResult PlaceOrder([FromBody] List<OrderItem> orderItem)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if(userId == null)
+            {
+                return NotFound(new { Message = "UserId not Found" });
+            }
             var order = _orderService.PlaceOrder(userId, orderItem);
             return Ok(order);
         }

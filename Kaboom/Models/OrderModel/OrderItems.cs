@@ -1,4 +1,5 @@
-﻿using Kaboom.Models.product;
+﻿using System.Text.Json.Serialization;
+using Kaboom.Models.product;
 
 namespace Kaboom.Models.Order
 {
@@ -6,6 +7,7 @@ namespace Kaboom.Models.Order
     {
         public int Id { get; set; }
         public int OrderId { get; set; }
+        [JsonIgnore]  // Prevent circular reference during serialization 
         public Orders Orders { get; set; }
         public int ProductId { get; set; }
         public Products Product { get; set; }

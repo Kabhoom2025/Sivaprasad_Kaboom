@@ -43,6 +43,14 @@ namespace Kaboom.Models
                 .WithOne(rt => rt.AuthUser)
                 .HasForeignKey(rt => rt.AuthUserId)
                 .OnDelete(DeleteBehavior.Cascade);
+            //This configuration specifies that each `Stock` is associated with one `Product`
+            //, and the foreign key in `Stocks` is `ProductId`. If a `Product` is deleted
+            //, all associated `Stocks` will also be deleted (`DeleteBehavior.Cascade`).
+            modelBuilder.Entity<Stocks>()
+            .HasOne(s => s.Products)
+            .WithMany()
+            .HasForeignKey(s => s.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
         }
     }
     
