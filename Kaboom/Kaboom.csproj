@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <Folder Include="Controllers\Database\" />
+    <Folder Include="Dockerfile\" />
     <Folder Include="Services\MongoServer\" />
   </ItemGroup>
 
