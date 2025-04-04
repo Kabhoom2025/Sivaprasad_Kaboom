@@ -2,6 +2,7 @@
 using Kaboom.Models;
 using Kaboom.Models.Admin;
 using Kaboom.Models.Order;
+using Kaboom.Models.product;
 using Kaboom.Models.StockModel;
 using Kaboom.SignalR;
 using Microsoft.AspNetCore.SignalR;
@@ -34,7 +35,9 @@ namespace Kaboom.Services
 
         public List<Orders> GetOrderByUserId(int userId)
         {
-            var data = _context.Orders.Where(o=>o.UserId == userId).ToList();  
+            var data = _context.Orders.Where(o=>o.UserId == userId || o.AdminId == userId)
+                .Include(o=>o.OrderItems)
+                .ThenInclude(p => p.Product).ToList();  
             return data;
         }
 

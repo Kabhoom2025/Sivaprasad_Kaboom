@@ -29,11 +29,15 @@ namespace Kaboom.Controllers
             var order = _orderService.PlaceOrder(userId, orderItem);
             return Ok(order);
         }
-        [Authorize]
+        //[Authorize]
         [HttpGet("user-orders")]
         public IActionResult GetUserOrder()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (userId == null)
+            {
+                return BadRequest();
+            }
             var orders = _orderService.GetOrderByUserId(userId);
             return Ok(orders);  
         }
