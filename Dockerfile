@@ -18,6 +18,9 @@ COPY --from=build /app/publish .
 
 # Expose port 80 for Render
 EXPOSE 80
+RUN dotnet --info
+RUN ls -la out
+ENTRYPOINT ["dotnet", "Kaboom.dll"]
 
 # Start your app (update DLL name if needed)//
 ENTRYPOINT ["dotnet", "Kaboom.dll"]
