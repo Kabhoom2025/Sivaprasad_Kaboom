@@ -106,7 +106,7 @@ namespace Kaboom.Controllers
                 return NotFound("User not Found");
             return Ok("User Deleted Successfully");
         }
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpPost("register-user")]
         public IActionResult RegisterUser([FromBody] Users user)
         {

@@ -24,6 +24,7 @@ namespace Kaboom.Controllers
             {
                 return NotFound(new { Message = "No users found." });
             }
+            // Optionally, you can return a custom message if no users are found
             return Ok(users);
 
         }

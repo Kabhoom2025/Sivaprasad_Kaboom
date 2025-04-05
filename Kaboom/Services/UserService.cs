@@ -71,7 +71,7 @@ namespace Kaboom.Services
             throw new Exception("Invalid Database Provider");
             }
 
-        public Users RegisterUser(Users user)
+        public Users Registeruser(Users user)
         {
             var existinguser = _context.Users.FirstOrDefault(x => x.UserEmail == user.UserEmail);
             if (existinguser != null)
@@ -79,32 +79,23 @@ namespace Kaboom.Services
                 throw new Exception("Email already exist");
             }
             
-            var auth = new AuthUser
-            {
-                Email = user.UserEmail,
-                PasswordHash = user.PasswordHash,
-                Role = "User",
-                ProfileImageUrl = user.ProfileImageUrl
-            };
-            var authregister = _authService.RegisterUser(auth, user.PasswordHash);
-            if (authregister == null)
-            {
-                throw new Exception("Invalid credentials");
-            }
+          
             if (_dataBaseService.GetCurrentDatabaseProvider()==DatabaseProviders.Sqlserver)
             {
-               // user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
-                var data = new Users
+                var auth = new AuthUser
                 {
-                    UserEmail = auth.Email,
-                    UserName = user.UserName,
-                    PasswordHash = auth.PasswordHash,
+                    Name = user.UserName,
+                    Email = user.UserEmail,
+                    PasswordHash = user.PasswordHash,
                     Role = "User",
-                    ProfileImageUrl = auth.ProfileImageUrl,
-                   // orders = user.orders
+                    ProfileImageUrl = user.ProfileImageUrl
                 };
-                _context.Users.Add(data);
-                _context.SaveChanges();
+                var authregister = _authService.RegisterUser(auth, user.PasswordHash);
+                if (authregister == null)
+                {
+                    throw new Exception("Invalid credentials");
+                }
+
                 return user;
             }
             else if(_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.MongoDb)
@@ -156,7 +147,7 @@ namespace Kaboom.Services
                 }
                 if (!string.IsNullOrEmpty(Updateuser.Role))
                 {
-                    users.Role = Updateuser.Role;
+                    users.Role = "User";
                 }
 
                 if (!string.IsNullOrEmpty(Updateuser.ProfileImageUrl))
@@ -167,6 +158,7 @@ namespace Kaboom.Services
                 _context.SaveChanges();
                 var auth = new AuthUser
                 {
+                    Name = users.UserName,
                     Email = users.UserEmail,
                     PasswordHash = users.PasswordHash,
                     Role = users.Role,

@@ -144,6 +144,10 @@ namespace Kaboom.Services.Auth
                     PlainTextPassword = password,
 
                 };
+                if (data.Role == null)
+                {
+                    return "Role is required";
+                }
                 _context.AuthUser.Add(data);
                  _context.SaveChanges();
                 switch (user.Role.ToLower())
@@ -165,7 +169,7 @@ namespace Kaboom.Services.Auth
                         var AdminUser = new Admins
                         {
                             Email = user.Email,
-                            UserName = user.Name,
+                            UserName = data.Name,
                             PasswordHash = hashedpassword,
                             Role = "Admin",
                             ProfileImageUrl = user.ProfileImageUrl

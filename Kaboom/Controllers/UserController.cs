@@ -22,7 +22,7 @@ namespace Kaboom.Controllers
         {
             try
             {
-                var newUser = _userService.RegisterUser(user);
+                var newUser = _userService.Registeruser(user);
                 if (newUser != null)
                 {
                     return Ok(new { Message = "User Registered successfully",User = newUser });

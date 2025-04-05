@@ -75,6 +75,7 @@ namespace Kaboom.Services
                 admin.PasswordHash = BCrypt.Net.BCrypt.HashPassword(admin.PasswordHash);
                 var authAdmin = new AuthUser
                 {
+                    Name = admin.UserName,
                     Email = admin.Email,
                     PasswordHash = admin.PasswordHash,
                     Role = "Admin",
@@ -126,6 +127,7 @@ namespace Kaboom.Services
                 // Create a corresponding AuthUser entry
                 var auth = new AuthUser
                 {
+                    Name = user.UserName,
                     Email = user.UserEmail,
                     PasswordHash = user.PasswordHash,
                     Role = "User",  // Admin or User
@@ -141,7 +143,7 @@ namespace Kaboom.Services
                     UserEmail = user.UserEmail,
                     UserName = user.UserName,
                     PasswordHash = user.PasswordHash,
-                    Role = userRole,
+                    Role = "User",
                     ProfileImageUrl = user.ProfileImageUrl
                 };
 
