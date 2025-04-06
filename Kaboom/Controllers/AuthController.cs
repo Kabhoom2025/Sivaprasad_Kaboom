@@ -76,8 +76,8 @@ namespace Kaboom.Controllers
                 return Unauthorized(new { Message = ex.Message });
             }
         }
-        [HttpPost("refresh-token")]
-        public IActionResult RefreshToken([FromBody] RefreshTokenRequest request)
+        [HttpPost("Validate-token")]
+        public IActionResult ValidaterefreshToken([FromBody] RefreshTokenRequest request)
         {
             var users = _authservices.GetUserByEmail(request.Email);
             if (users == null)
