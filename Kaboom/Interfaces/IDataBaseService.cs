@@ -1,7 +1,4 @@
-﻿using Kaboom.Models.Order;
-using Kaboom.Models.product;
-using Kaboom.Models.Users;
-namespace Kaboom.Interfaces
+﻿namespace Kaboom.Interfaces
 {
     public interface IDataBaseService
     {

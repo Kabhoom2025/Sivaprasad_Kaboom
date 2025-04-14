@@ -1,7 +1,6 @@
 ﻿using Kaboom.Interfaces;
 using Kaboom.Models;
 using MongoDB.Driver;
-using MongoDB.Driver.Authentication;
 
 namespace Kaboom.Services.Repository
 {
@@ -17,14 +16,14 @@ namespace Kaboom.Services.Repository
             _dataBaseService = dataBaseService;
         }
 
-        public IRepository<T> CreateRepository<T>(string collectionName="") where T : class 
+        public IRepository<T> CreateRepository<T>(string collectionName = "") where T : class
         {
             string provider = _dataBaseService.GetCurrentDatabaseProvider();
             return provider switch
             {
                 "SqlServerProvider" => new SQLRepository<T>(_context),
                 "MongoDbProvider" => new MongoRepository<T>(_mongoData, collectionName),
-                _ => throw new InvalidOperationException($"{provider}"+"Invalid database provider selected")
+                _ => throw new InvalidOperationException($"{provider}" + "Invalid database provider selected")
             };
         }
     }

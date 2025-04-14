@@ -17,7 +17,7 @@ namespace Kaboom.Services
         private readonly IAuthService _authService;
         private readonly IMongoDatabase _mongodatabase;
 
-        public AdminService(ApplicationDbContext context, IDataBaseService dataBaseService, IAuthService authService,IMongoClient mongoClient)
+        public AdminService(ApplicationDbContext context, IDataBaseService dataBaseService, IAuthService authService, IMongoClient mongoClient)
         {
             _context = context;
             _dataBaseService = dataBaseService;
@@ -26,7 +26,7 @@ namespace Kaboom.Services
         }
         public bool DeleteUser(int userId)
         {
-            var user = _context.Users.FirstOrDefault(u=>u.Id == userId);
+            var user = _context.Users.FirstOrDefault(u => u.Id == userId);
             if (user == null)
             {
                 return false;
@@ -66,9 +66,9 @@ namespace Kaboom.Services
         }
         public Admins RegisterAdmin(Admins admin)
         {
-           if(_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.Sqlserver)
+            if (_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.Sqlserver)
             {
-                if(_context.Admins.Any(x=>x.Email == admin.Email))
+                if (_context.Admins.Any(x => x.Email == admin.Email))
                 {
                     throw new Exception("Admin with this email Already Exists");
                 }
@@ -82,7 +82,7 @@ namespace Kaboom.Services
                     ProfileImageUrl = admin.ProfileImageUrl
                 };
                 var authuser = _authService.RegisterUser(authAdmin, admin.PasswordHash);
-                if(authuser == null)
+                if (authuser == null)
                 {
                     throw new Exception("Invalid Credentials");
                 }
@@ -90,13 +90,13 @@ namespace Kaboom.Services
                 _context.SaveChanges();
                 return admin;
             }
-           throw new Exception("Invalid Database Provider");
+            throw new Exception("Invalid Database Provider");
         }
 
         public bool UpdateAdminProfile(int id, Admins admin)
         {
-            var existingadmin = _context.Admins.FirstOrDefault(a=>a.Id == id);
-            if(existingadmin == null)
+            var existingadmin = _context.Admins.FirstOrDefault(a => a.Id == id);
+            if (existingadmin == null)
             {
                 return false;
             }

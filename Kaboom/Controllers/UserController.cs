@@ -1,9 +1,6 @@
 ﻿using System.Security.Claims;
 using Kaboom.Interfaces;
-using Kaboom.Models.UltimateModel;
 using Kaboom.Models.Users;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kaboom.Controllers
@@ -18,14 +15,14 @@ namespace Kaboom.Controllers
             _userService = userService;
         }
         [HttpPost("register")]
-        public IActionResult RegisterUser([FromBody]Users user)
+        public IActionResult RegisterUser([FromBody] Users user)
         {
             try
             {
                 var newUser = _userService.Registeruser(user);
                 if (newUser != null)
                 {
-                    return Ok(new { Message = "User Registered successfully",User = newUser });
+                    return Ok(new { Message = "User Registered successfully", User = newUser });
                 }
             }
             catch (Exception ex)
@@ -34,16 +31,16 @@ namespace Kaboom.Controllers
             }
             return Ok(user);
         }
-       // [Authorize(Roles ="Admin")]
+        // [Authorize(Roles ="Admin")]
         [HttpPatch("update-user/{id}")]
-        public IActionResult UpdateUser(int id, [FromBody]Users user)
+        public IActionResult UpdateUser(int id, [FromBody] Users user)
         {
             try
             {
                 var upuser = _userService.UpdateUser(id, user);
                 return Ok(upuser);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -56,7 +53,7 @@ namespace Kaboom.Controllers
                 var user = _userService.GetUserById(id);
                 return Ok(user);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -69,7 +66,7 @@ namespace Kaboom.Controllers
                 var user = _userService.GetUserByEmail(email);
                 return Ok(user);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -82,7 +79,7 @@ namespace Kaboom.Controllers
                 var isValid = _userService.ValidateUser(request.UserEmail, request.PasswordHash);
                 if (!isValid)
                     return Unauthorized(new { Message = "Invalid Email or Password" });
-                return Ok(new {Message = "User Validated Successfully"});
+                return Ok(new { Message = "User Validated Successfully" });
             }
             catch (Exception ex)
             {
@@ -98,7 +95,7 @@ namespace Kaboom.Controllers
                 var orders = _userService.GetUserOrderHistory(id);
                 return Ok(orders);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -107,7 +104,7 @@ namespace Kaboom.Controllers
         public IActionResult GetUserProfile()
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            if(string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized(new { Message = "Invalid Token" });
             }
@@ -115,9 +112,9 @@ namespace Kaboom.Controllers
             if (user == null)
                 return NotFound(new { Message = "User not Found" });
 
-            return Ok(user);    
+            return Ok(user);
         }
-       // [Authorize(Roles ="Admin")]
+        // [Authorize(Roles ="Admin")]
         [HttpGet("GetAllUsers")]
         public IActionResult GetAllUsers()
         {

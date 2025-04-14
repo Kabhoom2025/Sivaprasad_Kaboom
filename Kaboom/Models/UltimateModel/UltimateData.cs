@@ -1,6 +1,4 @@
-﻿using Kaboom.Models.Order;
-
-namespace Kaboom.Models.UltimateModel
+﻿namespace Kaboom.Models.UltimateModel
 {
     public class UltimateData
     {

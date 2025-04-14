@@ -3,19 +3,18 @@ using Kaboom.Models.AuthUserModel;
 using Kaboom.Models.Order;
 using Kaboom.Models.product;
 using Kaboom.Models.StockModel;
-using Kaboom.Models.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kaboom.Models
 {
-    public class ApplicationDbContext:DbContext
+    public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
 
         }
         public DbSet<Users.Users> Users { get; set; }
-        public DbSet<Products>  Products { get; set; }
+        public DbSet<Products> Products { get; set; }
         public DbSet<Orders> Orders { get; set; }
         public DbSet<OrderItems> OrderItems { get; set; }
         public DbSet<AuthUser> AuthUser { get; set; }
@@ -53,5 +52,5 @@ namespace Kaboom.Models
             .OnDelete(DeleteBehavior.Cascade);
         }
     }
-    
+
 }

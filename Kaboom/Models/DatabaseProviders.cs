@@ -3,6 +3,6 @@
     public static class DatabaseProviders
     {
         public const string Sqlserver = "SqlServerProvider";
-        public const string MongoDb =  "MongoDbProvider";
+        public const string MongoDb = "MongoDbProvider";
     }
 }

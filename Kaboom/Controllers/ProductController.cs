@@ -2,7 +2,6 @@
 using Kaboom.Models.product;
 using Kaboom.Models.productModel;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kaboom.Controllers
@@ -32,7 +31,7 @@ namespace Kaboom.Controllers
             }
             return Ok(product);
         }
-       // [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         [HttpPost("Addproduct")]
         public IActionResult AddProduct([FromBody] Products products)
         {
@@ -48,7 +47,7 @@ namespace Kaboom.Controllers
                 return NotFound(new { Message = "Product not Found" });
             return Ok(update);
         }
-      //  [Authorize(Roles = "Admin")]
+        //  [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public IActionResult DeleteProduct(int id)
         {
@@ -58,12 +57,12 @@ namespace Kaboom.Controllers
             return Ok(new { Message = $"{isDeleted} Product Deleted Successfully" });
         }
         [HttpPatch("{productId}/AddStock")]
-        public IActionResult AddStock( [FromBody] UpdateStockRequest request)
+        public IActionResult AddStock([FromBody] UpdateStockRequest request)
         {
             var isUpdated = _productService.UpdateStock(request.ProductId, request.NewQuantity);
             if (!isUpdated)
                 return NotFound(new { Message = "Product not Found" });
-            return Ok(new { Message = $"{isUpdated} Product Stock Updated Successfully"});
+            return Ok(new { Message = $"{isUpdated} Product Stock Updated Successfully" });
         }
     }
 }

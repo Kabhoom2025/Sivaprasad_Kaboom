@@ -2,11 +2,9 @@
 using Kaboom.Models;
 using Kaboom.Models.AuthUserModel;
 using Kaboom.Models.Order;
-using Kaboom.Models.UltimateModel;
 using Kaboom.Models.Users;
 
 using MongoDB.Driver;
-using Newtonsoft.Json;
 
 namespace Kaboom.Services
 {
@@ -16,7 +14,7 @@ namespace Kaboom.Services
         private readonly IDataBaseService _dataBaseService;
         private readonly IMongoDatabase _mongoDB;
         private readonly IAuthService _authService;
-        public UserService(ApplicationDbContext context, IDataBaseService dataBaseService, IMongoClient mongoClient,IAuthService authService)
+        public UserService(ApplicationDbContext context, IDataBaseService dataBaseService, IMongoClient mongoClient, IAuthService authService)
         {
             _context = context;
             _dataBaseService = dataBaseService;
@@ -42,14 +40,14 @@ namespace Kaboom.Services
                 return collection.Find(x => x.UserEmail == email).FirstOrDefault() ?? throw new Exception("Email not Found");
             }
             throw new Exception("Invalid Database Provider");
-            }
+        }
         public Users GetUserById(int id)
         {
             if (_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.Sqlserver)
             {
-                return _context.Users.FirstOrDefault(x=>x.Id==id) ?? throw new Exception("User not Found");
+                return _context.Users.FirstOrDefault(x => x.Id == id) ?? throw new Exception("User not Found");
             }
-            else if(_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.MongoDb)
+            else if (_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.MongoDb)
             {
                 var collection = _mongoDB.GetCollection<Users>("Users");
                 return collection.Find(x => x.Id == id).FirstOrDefault() ?? throw new Exception("User not Found");
@@ -61,15 +59,15 @@ namespace Kaboom.Services
         {
             if (_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.Sqlserver)
             {
-                return _context.Orders.Where(o=>o.UserId==userId).ToList();
+                return _context.Orders.Where(o => o.UserId == userId).ToList();
             }
             else if (_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.Sqlserver)
             {
                 var collection = _mongoDB.GetCollection<Orders>("Orders");
-                return collection.Find(o=>o.UserId == userId).ToList();
+                return collection.Find(o => o.UserId == userId).ToList();
             }
             throw new Exception("Invalid Database Provider");
-            }
+        }
 
         public Users Registeruser(Users user)
         {
@@ -78,9 +76,9 @@ namespace Kaboom.Services
             {
                 throw new Exception("Email already exist");
             }
-            
-          
-            if (_dataBaseService.GetCurrentDatabaseProvider()==DatabaseProviders.Sqlserver)
+
+
+            if (_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.Sqlserver)
             {
                 var auth = new AuthUser
                 {
@@ -98,10 +96,10 @@ namespace Kaboom.Services
 
                 return user;
             }
-            else if(_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.MongoDb)
+            else if (_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.MongoDb)
             {
                 var collection = _mongoDB.GetCollection<Users>("Users");
-                var existing= collection.Find(u=>u.UserEmail == user.UserEmail).FirstOrDefault();
+                var existing = collection.Find(u => u.UserEmail == user.UserEmail).FirstOrDefault();
                 if (existing != null)
                     throw new Exception("User already exists");
                 user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
@@ -109,7 +107,7 @@ namespace Kaboom.Services
                 return user;
             }
             return user;
-            
+
         }
 
         public Users UpdateUser(int id, Users Updateuser)
@@ -119,19 +117,19 @@ namespace Kaboom.Services
             string? newPasswordHash = null;
             if (_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.Sqlserver)
             {
-                var users =_context.Users.FirstOrDefault(u=>u.Id == id);
+                var users = _context.Users.FirstOrDefault(u => u.Id == id);
                 if (users == null)
                 {
                     throw new Exception("User not Found");
                 }
-                
-                if(!string.IsNullOrEmpty(Updateuser.UserName))
+
+                if (!string.IsNullOrEmpty(Updateuser.UserName))
                 {
-                   users.UserName = Updateuser.UserName;
+                    users.UserName = Updateuser.UserName;
                 }
                 if (!string.IsNullOrEmpty(Updateuser.UserEmail))
                 {
-                    var emailexists = _context.Users.Any(x=>x.UserEmail==Updateuser.UserEmail && x.Id==id);
+                    var emailexists = _context.Users.Any(x => x.UserEmail == Updateuser.UserEmail && x.Id == id);
                     if (emailexists)
                     {
                         throw new Exception("Email is already associated with another account");
@@ -163,15 +161,15 @@ namespace Kaboom.Services
                     PasswordHash = users.PasswordHash,
                     Role = users.Role,
                     ProfileImageUrl = users.ProfileImageUrl,
-                    
+
                 };
-                if ( emailUpdated|| passwordUpdated)
+                if (emailUpdated || passwordUpdated)
                 {
-                   _authService.UpdateAuthUser(id, auth);
+                    _authService.UpdateAuthUser(id, auth);
                 }
                 return users;
             }
-            else if(_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.MongoDb)
+            else if (_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.MongoDb)
             {
 
             }
@@ -180,7 +178,7 @@ namespace Kaboom.Services
 
         public bool ValidateUser(string email, string password)
         {
-           var user = GetUserByEmail(email);
+            var user = GetUserByEmail(email);
             if (user == null)
                 return false;
             return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);

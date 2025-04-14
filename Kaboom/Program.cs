@@ -6,7 +6,6 @@ using Kaboom.Services.Auth;
 using Kaboom.Services.Repository;
 using Kaboom.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 
@@ -17,8 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Configuration.SetBasePath(Directory.GetCurrentDirectory()).
-    AddJsonFile("appsettings.json",optional: false, reloadOnChange: true).
-    AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true,reloadOnChange:true)
+    AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).
+    AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 var JwtSettings = builder.Configuration.GetSection("Jwt");
@@ -73,7 +72,7 @@ builder.Services.AddSingleton<IDataBaseService, DatabaseService>(); //Default to
 
 // Register Repository Factory
 builder.Services.AddScoped<RepositoryFactory>();
-builder.Services.AddScoped<IDataBaseService,DatabaseService>();
+builder.Services.AddScoped<IDataBaseService, DatabaseService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IUserService, UserService>();

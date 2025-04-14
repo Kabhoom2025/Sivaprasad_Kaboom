@@ -16,7 +16,7 @@ namespace Kaboom.Services.Repository
 
         public async Task AddAsync(T entity)
         {
-           await _dbSet.AddAsync(entity);
+            await _dbSet.AddAsync(entity);
             await _context.SaveChangesAsync();
         }
 

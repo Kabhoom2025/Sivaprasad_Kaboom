@@ -1,13 +1,10 @@
 ﻿using Kaboom.Interfaces;
 using Kaboom.Models;
-using Kaboom.Models.Admin;
 using Kaboom.Models.Order;
-using Kaboom.Models.product;
 using Kaboom.Models.StockModel;
 using Kaboom.SignalR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Asn1.X509;
 
 namespace Kaboom.Services
 {
@@ -23,7 +20,7 @@ namespace Kaboom.Services
         }
         public List<Orders> GetAllOrders()
         {
-           var data = _context.Orders.Include(o=>o.OrderItems).ThenInclude(p=>p.Product).ToList();
+            var data = _context.Orders.Include(o => o.OrderItems).ThenInclude(p => p.Product).ToList();
             return data;
         }
 
@@ -35,9 +32,9 @@ namespace Kaboom.Services
 
         public List<Orders> GetOrderByUserId(int userId)
         {
-            var data = _context.Orders.Where(o=>o.UserId == userId || o.AdminId == userId)
-                .Include(o=>o.OrderItems)
-                .ThenInclude(p => p.Product).ToList();  
+            var data = _context.Orders.Where(o => o.UserId == userId || o.AdminId == userId)
+                .Include(o => o.OrderItems)
+                .ThenInclude(p => p.Product).ToList();
             return data;
         }
 
@@ -46,7 +43,7 @@ namespace Kaboom.Services
             var user = _context.Users?.Find(userId);
             var admin = _context.Admins?.Find(userId);
             var auth = _context.AuthUser.Find(userId);
-            if(user == null && admin == null && auth == null)
+            if (user == null && admin == null && auth == null)
             {
                 throw new Exception("User not Found");
             }
@@ -58,14 +55,14 @@ namespace Kaboom.Services
                 TotalAmount = 0,
                 OrderItems = new List<OrderItems>()
             };
-            foreach(var item in orderitems)
+            foreach (var item in orderitems)
             {
                 var product = _context.Products.Find(item.ProductId);
-                if(product == null)
+                if (product == null)
                 {
                     throw new Exception($"Product with ID {item.ProductId} not Found");
                 }
-                if(product.ProductStock < item.Quantity)
+                if (product.ProductStock < item.Quantity)
                 {
                     throw new Exception($"Not Enough stock for {product.ProductName}. Available: {product.ProductStock}, Requested: {item.Quantity}");
                 }
@@ -75,7 +72,7 @@ namespace Kaboom.Services
                 orders.OrderItems.Add(new OrderItems
                 {
                     ProductId = item.ProductId,
-                    Price = price ,
+                    Price = price,
                     Quantity = item.Quantity,
                 });
                 orders.TotalAmount = orders.OrderItems.Sum(i => i.Price * i.Quantity);

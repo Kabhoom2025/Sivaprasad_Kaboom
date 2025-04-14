@@ -1,9 +1,6 @@
 ﻿using System.Security.Claims;
 using Kaboom.Interfaces;
 using Kaboom.Models;
-using Kaboom.Models.UltimateModel;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kaboom.Controllers
@@ -17,12 +14,12 @@ namespace Kaboom.Controllers
         {
             _orderService = orderService;
         }
-       // [Authorize]
+        // [Authorize]
         [HttpPost("placeorder")]
         public IActionResult PlaceOrder([FromBody] List<OrderItem> orderItem)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if(userId == null)
+            if (userId == null)
             {
                 return NotFound(new { Message = "UserId not Found" });
             }
@@ -39,23 +36,23 @@ namespace Kaboom.Controllers
                 return BadRequest();
             }
             var orders = _orderService.GetOrderByUserId(userId);
-            return Ok(orders);  
+            return Ok(orders);
         }
-      //  [Authorize(Roles ="Admin")]
+        //  [Authorize(Roles ="Admin")]
         [HttpGet("all")]
         public IActionResult GetAllOrders()
         {
             var order = _orderService.GetAllOrders();
             return Ok(order);
         }
-       // [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         [HttpGet("{orderId}")]
         public IActionResult GetOrderById(int id)
         {
             var order = _orderService.GetOrderById(id);
-            if(order==null)
-                return NotFound(new {Message = "Order not Found"});
-            return Ok(order);   
+            if (order == null)
+                return NotFound(new { Message = "Order not Found" });
+            return Ok(order);
         }
     }
 }

@@ -1,11 +1,7 @@
 ﻿using System.Security.Claims;
-using System.Text.Json;
 using Kaboom.Interfaces;
 using Kaboom.Models.AuthUserModel;
-using Kaboom.Models.Users;
-using Kaboom.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kaboom.Controllers
@@ -78,7 +74,7 @@ namespace Kaboom.Controllers
                 }
                 var token = _authservices.Login(request.Email, request.Password);
                 var refreshToken = _authservices.GenerateRefreshToken(user.Id);
-                return Ok(new { Token = token, RefreshToken = refreshToken,User =user });
+                return Ok(new { Token = token, RefreshToken = refreshToken, User = user });
 
             }
             catch (UnauthorizedAccessException ex)

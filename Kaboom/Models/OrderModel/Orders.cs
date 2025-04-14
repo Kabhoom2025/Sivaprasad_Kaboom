@@ -1,9 +1,4 @@
-﻿
-
-using Kaboom.Models.Admin;
-using Kaboom.Models.Users;
-
-namespace Kaboom.Models.Order
+﻿namespace Kaboom.Models.Order
 {
     public class Orders
     {

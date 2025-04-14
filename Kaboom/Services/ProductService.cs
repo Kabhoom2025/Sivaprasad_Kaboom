@@ -66,9 +66,9 @@ namespace Kaboom.Services
             }
             existingProduct.ProductName = product.ProductName ?? existingProduct.ProductName;
             existingProduct.ProductDescription = product.ProductDescription ?? existingProduct.ProductDescription;
-            existingProduct.ProductPrice = product.ProductPrice !=0 ? product.ProductPrice : existingProduct.ProductPrice;
-            existingProduct.ProductImageUrl= product.ProductImageUrl ?? existingProduct.ProductImageUrl;
-            existingProduct.ProductStock= product.ProductStock !=0 ? product.ProductStock : existingProduct.ProductStock;
+            existingProduct.ProductPrice = product.ProductPrice != 0 ? product.ProductPrice : existingProduct.ProductPrice;
+            existingProduct.ProductImageUrl = product.ProductImageUrl ?? existingProduct.ProductImageUrl;
+            existingProduct.ProductStock = product.ProductStock != 0 ? product.ProductStock : existingProduct.ProductStock;
 
             _context.SaveChanges();
             return existingProduct;
@@ -77,7 +77,7 @@ namespace Kaboom.Services
         public bool UpdateStock(int productId, int newQuantity)
         {
             var product = _context.Products.Find(productId);
-            if(product == null)
+            if (product == null)
             {
                 return false;
             }

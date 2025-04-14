@@ -1,5 +1,4 @@
 ﻿using Kaboom.Models.Order;
-using Kaboom.Models.UltimateModel;
 using Kaboom.Models.Users;
 
 namespace Kaboom.Interfaces
@@ -10,7 +9,7 @@ namespace Kaboom.Interfaces
         Users GetUserById(int id);
         Users GetUserByEmail(string email);
         Users Registeruser(Users user);
-        Users UpdateUser(int id,Users user);
+        Users UpdateUser(int id, Users user);
         bool ValidateUser(string email, string password);
         List<Orders> GetUserOrderHistory(int userId);
     }

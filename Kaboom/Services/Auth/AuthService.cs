@@ -1,5 +1,4 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -39,13 +38,13 @@ namespace Kaboom.Services.Auth
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecurityKey"]));
             //var key = new SymmetricSecurityKey(Convert.FromBase64String(_configuration["Jwt:SecurityKey"]));
-            var creds = new SigningCredentials(key,SecurityAlgorithms.HmacSha256);
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
                 _configuration["Jwt:Issuer"],
                 _configuration["Jwt:Audience"],
                 claims,
-                expires:DateTime.UtcNow.AddDays(7),
-                signingCredentials:creds);
+                expires: DateTime.UtcNow.AddDays(7),
+                signingCredentials: creds);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
@@ -63,12 +62,12 @@ namespace Kaboom.Services.Auth
                 IsRevoked = false
             };
             string provider = _dataBaseService.GetCurrentDatabaseProvider();
-            if(provider == DatabaseProviders.Sqlserver)
+            if (provider == DatabaseProviders.Sqlserver)
             {
                 _context.RefreshToken.Add(refreshtokenentity);
                 _context.SaveChanges();
             }
-            else if(provider == DatabaseProviders.MongoDb)
+            else if (provider == DatabaseProviders.MongoDb)
             {
                 var collection = _mongodatabase.GetCollection<RefreshToken>("RefreshTokens");
                 collection.InsertOne(refreshtokenentity);
@@ -84,12 +83,12 @@ namespace Kaboom.Services.Auth
             {
                 user = _context.Set<AuthUser>().FirstOrDefault(x => x.Email == email);
             }
-            else if(provider == DatabaseProviders.MongoDb)
+            else if (provider == DatabaseProviders.MongoDb)
             {
                 var collection = _mongodatabase.GetCollection<AuthUser>("AuthUsers");
-                user = collection.Find(u=>u.Email == email).FirstOrDefault();
+                user = collection.Find(u => u.Email == email).FirstOrDefault();
             }
-            if(user == null || !VerifyPassword(password,user.PasswordHash,user.Salt))
+            if (user == null || !VerifyPassword(password, user.PasswordHash, user.Salt))
             {
                 throw new UnauthorizedAccessException("Invalid credentials");
             }
@@ -100,16 +99,16 @@ namespace Kaboom.Services.Auth
         {
             string provider = _dataBaseService.GetCurrentDatabaseProvider();
             RefreshToken storedToken = null;
-            if(provider == DatabaseProviders.Sqlserver)
+            if (provider == DatabaseProviders.Sqlserver)
             {
-                storedToken = _context.RefreshToken.FirstOrDefault(rt=>rt.AuthUserId == UserId && rt.Token == token);
+                storedToken = _context.RefreshToken.FirstOrDefault(rt => rt.AuthUserId == UserId && rt.Token == token);
             }
-            else if(provider == DatabaseProviders.MongoDb)
+            else if (provider == DatabaseProviders.MongoDb)
             {
                 var collection = _mongodatabase.GetCollection<RefreshToken>("RefreshTokens");
-                storedToken =  collection.Find(rt=>rt.AuthUserId ==UserId && rt.Token == token).FirstOrDefault();    
+                storedToken = collection.Find(rt => rt.AuthUserId == UserId && rt.Token == token).FirstOrDefault();
             }
-            if(storedToken == null || storedToken.IsRevoked || storedToken.ExpiryDate < DateTime.UtcNow)
+            if (storedToken == null || storedToken.IsRevoked || storedToken.ExpiryDate < DateTime.UtcNow)
             {
                 return false;
             }
@@ -149,21 +148,21 @@ namespace Kaboom.Services.Auth
                 //    return "Role is required";
                 //}
                 _context.AuthUser.Add(data);
-                 _context.SaveChanges();
+                _context.SaveChanges();
                 switch (user.Role.ToLower())
                 {
                     case "user":
-               
-                var newUser = new Users
-                {
-                    UserEmail = user.Email,                
-                   UserName = user.Name,
-                    PasswordHash = hashedpassword,
-                    Role = "User",
-                    ProfileImageUrl = user.ProfileImageUrl
-                };
-                _context.Users.Add(newUser);
-                _context.SaveChanges();
+
+                        var newUser = new Users
+                        {
+                            UserEmail = user.Email,
+                            UserName = user.Name,
+                            PasswordHash = hashedpassword,
+                            Role = "User",
+                            ProfileImageUrl = user.ProfileImageUrl
+                        };
+                        _context.Users.Add(newUser);
+                        _context.SaveChanges();
                         break;
                     case "admin":
                         var AdminUser = new Admins
@@ -180,10 +179,10 @@ namespace Kaboom.Services.Auth
                     default:
                         throw new InvalidOperationException("Invalid Role Specified");
                 }
-                
+
             }
-            
-            else if(provider == DatabaseProviders.MongoDb)
+
+            else if (provider == DatabaseProviders.MongoDb)
             {
                 var collection = _mongodatabase.GetCollection<AuthUser>("AuthUsers");
                 existingUser = collection.Find(x =>
@@ -194,10 +193,10 @@ namespace Kaboom.Services.Auth
             {
                 throw new InvalidOperationException("Email is already in use. Please use a different email.");
             }
-            return  user;
+            return user;
         }
 
-         private (string hashedPassword, string salt) HashPassword(string password) 
+        private (string hashedPassword, string salt) HashPassword(string password)
         {
             byte[] saltBytes = new byte[16]; // 16-byte salt
             using (var rng = RandomNumberGenerator.Create())
@@ -252,7 +251,7 @@ namespace Kaboom.Services.Auth
         public string Logout(int id)
         {
             string provider = _dataBaseService.GetCurrentDatabaseProvider();
-            if(provider == DatabaseProviders.Sqlserver)
+            if (provider == DatabaseProviders.Sqlserver)
             {
                 var tokens = _context.RefreshToken.Where(rt => rt.AuthUserId == id).ToList();
                 if (tokens.Any())
@@ -271,9 +270,9 @@ namespace Kaboom.Services.Auth
 
         public AuthUser UpdateAuthUser(int userId, AuthUser updatedAuthUser)
         {
-            if(_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.Sqlserver)
+            if (_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.Sqlserver)
             {
-                var authuser = _context.AuthUser.FirstOrDefault(x=>x.Id == userId);
+                var authuser = _context.AuthUser.FirstOrDefault(x => x.Id == userId);
                 if (authuser == null)
                 {
                     throw new Exception("User not Found");
@@ -291,7 +290,7 @@ namespace Kaboom.Services.Auth
                     }
                     authuser.Email = updatedAuthUser.Email;
                 }
-                if(!string.IsNullOrEmpty(updatedAuthUser.PasswordHash))
+                if (!string.IsNullOrEmpty(updatedAuthUser.PasswordHash))
                 {
                     authuser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updatedAuthUser.PasswordHash);
                 }
@@ -299,7 +298,7 @@ namespace Kaboom.Services.Auth
                 {
                     authuser.Role = updatedAuthUser.Role;
                 }
-                if(!string.IsNullOrEmpty(updatedAuthUser.ProfileImageUrl))
+                if (!string.IsNullOrEmpty(updatedAuthUser.ProfileImageUrl))
                 {
                     authuser.ProfileImageUrl = updatedAuthUser.ProfileImageUrl;
                 }
@@ -308,7 +307,7 @@ namespace Kaboom.Services.Auth
                 return authuser;
 
             }
-            else if(_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.MongoDb)
+            else if (_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.MongoDb)
             {
 
             }
@@ -337,13 +336,13 @@ namespace Kaboom.Services.Auth
 
         public bool DeleteAuthUsers(List<int> userIds)
         {
-            var users = _context.AuthUser.Where(u=>userIds.Contains(u.Id)).ToList();    
-            if(users ==null ||users.Count == 0)
+            var users = _context.AuthUser.Where(u => userIds.Contains(u.Id)).ToList();
+            if (users == null || users.Count == 0)
             {
                 return false;
             }
-            var refreshtokens = _context.RefreshToken.Where(u=>userIds.Contains(u.AuthUserId)).ToList(); 
-            if(refreshtokens.Any())
+            var refreshtokens = _context.RefreshToken.Where(u => userIds.Contains(u.AuthUserId)).ToList();
+            if (refreshtokens.Any())
             {
                 _context.RefreshToken.RemoveRange(refreshtokens);
             }
@@ -358,7 +357,7 @@ namespace Kaboom.Services.Auth
                 _context.Users.RemoveRange(User);
             }
             _context.AuthUser.RemoveRange(users);
-            _context.SaveChanges(); 
+            _context.SaveChanges();
             return true;
         }
     }

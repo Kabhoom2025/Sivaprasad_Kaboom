@@ -1,8 +1,4 @@
 ﻿using Kaboom.Interfaces;
-using Kaboom.Models.Order;
-using Kaboom.Models.product;
-using Kaboom.Models.Users;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Kaboom.Services
 {

@@ -2,13 +2,11 @@
 using Kaboom.Models;
 using Kaboom.Models.Admin;
 using Kaboom.Models.Users;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kaboom.Controllers
 {
-  //  [Authorize(Roles ="Admin")]
+    //  [Authorize(Roles ="Admin")]
     // [Route("api/[controller]")]
     [Route("api/admin")]
     [ApiController]
@@ -16,7 +14,7 @@ namespace Kaboom.Controllers
     {
         private readonly IDataBaseService _dataBaseService;
         private readonly IAdminService _adminService;
-       
+
         public AdminController(IDataBaseService dataBaseService, IAdminService adminService)
         {
             _dataBaseService = dataBaseService;
@@ -25,7 +23,7 @@ namespace Kaboom.Controllers
         [HttpPost("switch")]
         public IActionResult SwitchDatabases([FromBody] string provider)
         {
-            if(provider != DatabaseProviders.Sqlserver  && provider != DatabaseProviders.MongoDb)
+            if (provider != DatabaseProviders.Sqlserver && provider != DatabaseProviders.MongoDb)
             {
                 return BadRequest("Invalid database Provider");
             }
