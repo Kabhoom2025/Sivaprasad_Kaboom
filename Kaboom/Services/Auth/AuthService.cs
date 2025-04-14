@@ -44,7 +44,7 @@ namespace Kaboom.Services.Auth
                 _configuration["Jwt:Issuer"],
                 _configuration["Jwt:Audience"],
                 claims,
-                expires:DateTime.UtcNow.AddMinutes(30),
+                expires:DateTime.UtcNow.AddDays(7),
                 signingCredentials:creds);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
@@ -116,7 +116,7 @@ namespace Kaboom.Services.Auth
             return true;
         }
 
-        public string RegisterUser(AuthUser user, string password)
+        public AuthUser RegisterUser(AuthUser user, string password)
         {
             var (hashedpassword, salt) = HashPassword(password);
             user.PasswordHash = hashedpassword;
@@ -144,10 +144,10 @@ namespace Kaboom.Services.Auth
                     PlainTextPassword = password,
 
                 };
-                if (data.Role == null)
-                {
-                    return "Role is required";
-                }
+                //if (data.Role == null)
+                //{
+                //    return "Role is required";
+                //}
                 _context.AuthUser.Add(data);
                  _context.SaveChanges();
                 switch (user.Role.ToLower())
@@ -194,7 +194,7 @@ namespace Kaboom.Services.Auth
             {
                 throw new InvalidOperationException("Email is already in use. Please use a different email.");
             }
-            return  "User Registered Successfully";
+            return  user;
         }
 
          private (string hashedPassword, string salt) HashPassword(string password) 
@@ -277,6 +277,10 @@ namespace Kaboom.Services.Auth
                 if (authuser == null)
                 {
                     throw new Exception("User not Found");
+                }
+                if (!string.IsNullOrEmpty(updatedAuthUser.Name))
+                {
+                    authuser.Name = updatedAuthUser.Name;
                 }
                 if (!string.IsNullOrEmpty(updatedAuthUser.Email))
                 {

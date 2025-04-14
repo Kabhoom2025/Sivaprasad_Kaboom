@@ -1,6 +1,9 @@
-﻿using Kaboom.Interfaces;
+﻿using System.Security.Claims;
+using System.Text.Json;
+using Kaboom.Interfaces;
 using Kaboom.Models.AuthUserModel;
 using Kaboom.Models.Users;
+using Kaboom.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +31,11 @@ namespace Kaboom.Controllers
             return Ok(users);
 
         }
+        [HttpGet("GetUser/{id}")]
+        public IActionResult GetUserDetails(string id)
+        {
+            return Ok();
+        }
         [HttpPost("register")]
         public IActionResult Register([FromBody] AuthUser authuser, [FromQuery] string password)
         {
@@ -36,8 +44,10 @@ namespace Kaboom.Controllers
                 return BadRequest("Invalid User Data");
             }
             var result = _authservices.RegisterUser(authuser, password);
-            return Ok(result);
+            return Ok(new { message = "Registered successfully", user = result });
         }
+
+
         [Authorize(Roles = "Admin")]
         [HttpPatch("update-auth/{id}")]
         public IActionResult UpdateAuthUser(int id, [FromBody] AuthUser updateUser)
@@ -68,7 +78,7 @@ namespace Kaboom.Controllers
                 }
                 var token = _authservices.Login(request.Email, request.Password);
                 var refreshToken = _authservices.GenerateRefreshToken(user.Id);
-                return Ok(new { Token = token, RefreshToken = refreshToken });
+                return Ok(new { Token = token, RefreshToken = refreshToken,User =user });
 
             }
             catch (UnauthorizedAccessException ex)
@@ -76,7 +86,7 @@ namespace Kaboom.Controllers
                 return Unauthorized(new { Message = ex.Message });
             }
         }
-        [HttpPost("Validate-token")]
+        [HttpPost("Refresh-token")]
         public IActionResult ValidaterefreshToken([FromBody] RefreshTokenRequest request)
         {
             var users = _authservices.GetUserByEmail(request.Email);
@@ -99,7 +109,7 @@ namespace Kaboom.Controllers
 
             };
             var newJwtToken = _authservices.GenerateJWTtoken(user);
-            return Ok(new { Token = newJwtToken });
+            return Ok(new { status = "Valid" });
         }
         [HttpPost("logout")]
         public IActionResult Logout([FromBody] LogOutRequest request)
@@ -123,7 +133,50 @@ namespace Kaboom.Controllers
             {
                 return NotFound(new { message = "some users are not found or already users deleted" });
             }
-            return Ok(result+"Users Deleted Successfully");
-    }
+            return Ok(result + "Users Deleted Successfully");
+        }
+        [HttpGet("Validate-token")]
+        public IActionResult ValidateToken()
+        {
+            return Ok(new { status = "Valid" });
+        }
+
+
+        [HttpPost("upload-profile-image")]
+        public IActionResult UploadProfileImage(IFormFile image)
+        {
+            if (image == null || image.Length == 0)
+            {
+                return BadRequest("No image uploaded.");
+            }
+
+            var imageName = Guid.NewGuid() + Path.GetExtension(image.FileName);
+            var savePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", imageName);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
+
+            using (var stream = new FileStream(savePath, FileMode.Create))
+            {
+                image.CopyTo(stream);
+            }
+
+            var imageUrl = $"/images/{imageName}";
+            return Ok(new { imageUrl });
+        }
+        [Authorize]
+        [HttpGet("profile")]
+        public IActionResult GetUserProfile()
+        {
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return Unauthorized(new { Message = "Invalid Token" });
+            }
+            var user = _authservices.GetUserByEmail(userEmail);
+            if (user == null)
+                return NotFound(new { Message = "User not Found" });
+
+            return Ok(user);
+        }
     }
 }

@@ -5,7 +5,7 @@ namespace Kaboom.Interfaces
     public interface IAuthService
     {
         List<AuthUser> GetAllUser();
-        string RegisterUser(AuthUser user, string password);
+        AuthUser RegisterUser(AuthUser user, string password);
         string GenerateJWTtoken(AuthUser user);
         string GenerateRefreshToken(int userId);
         bool ValidateRefreshToken(int UserId, string token);
