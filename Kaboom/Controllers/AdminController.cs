@@ -1,6 +1,7 @@
 ﻿using Kaboom.Interfaces;
 using Kaboom.Models;
 using Kaboom.Models.Admin;
+using Kaboom.Models.Features;
 using Kaboom.Models.Users;
 using Microsoft.AspNetCore.Mvc;
 
@@ -118,6 +119,24 @@ namespace Kaboom.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        [HttpPost("set-feature")]
+        public IActionResult SetFeature([FromBody] PreferenceToggle preferences)
+        {
+           var data = _adminService.SetFeature(preferences);
+            if (data == null)
+                return NotFound("Feature not Found");
+            return Ok(data);
+        }
+        [HttpGet("get-feature")]
+        public IActionResult GetFeature()
+        {
+            var data = _adminService.GetFeature();
+            if (data == null)
+                return NotFound("Feature not Found");
+            return Ok(data);
+        }
 
     }
+   
+    
 }

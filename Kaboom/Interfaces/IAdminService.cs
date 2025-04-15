@@ -1,4 +1,5 @@
 ﻿using Kaboom.Models.Admin;
+using Kaboom.Models.Features;
 using Kaboom.Models.Order;
 using Kaboom.Models.product;
 using Kaboom.Models.Users;
@@ -17,5 +18,7 @@ namespace Kaboom.Interfaces
         bool DeleteUser(int userId);
         public Users RegisterUserFromAdmin(Users user);
         public List<Admins> GetAllAdmins();
+        public PreferenceToggle SetFeature(PreferenceToggle preferences);
+        public PreferenceToggle GetFeature();
     }
 }

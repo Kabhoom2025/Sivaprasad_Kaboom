@@ -1,5 +1,6 @@
 ﻿using Kaboom.Models.Admin;
 using Kaboom.Models.AuthUserModel;
+using Kaboom.Models.Features;
 using Kaboom.Models.Order;
 using Kaboom.Models.product;
 using Kaboom.Models.StockModel;
@@ -21,6 +22,7 @@ namespace Kaboom.Models
         public DbSet<RefreshToken> RefreshToken { get; set; }
         public DbSet<Admins> Admins { get; set; }
         public DbSet<Stocks> Stocks { get; set; }
+        public DbSet<PreferenceToggle> PreferenceToggle { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -2,6 +2,7 @@
 using Kaboom.Models;
 using Kaboom.Models.Admin;
 using Kaboom.Models.AuthUserModel;
+using Kaboom.Models.Features;
 using Kaboom.Models.Order;
 using Kaboom.Models.product;
 using Kaboom.Models.Users;
@@ -167,5 +168,30 @@ namespace Kaboom.Services
             return user;
         }
 
+        public PreferenceToggle SetFeature(PreferenceToggle preferences)
+        {
+            var existing = _context.PreferenceToggle.FirstOrDefault(x => x.FeatureKey == preferences.FeatureKey);
+            if (existing != null)
+            {
+                existing.IsEnabled = preferences.IsEnabled;
+                _context.SaveChanges();
+                return existing;
+            }
+            else
+            {
+                _context.PreferenceToggle.Add(preferences);
+                _context.SaveChanges();
+                return preferences;
+            }
+        }
+        public PreferenceToggle GetFeature()
+        {
+            var feature = _context.PreferenceToggle.ToList();
+            if (feature == null)
+            {
+                throw new Exception("No Feature Found");
+            }
+            return feature.FirstOrDefault();
+        }
     }
 }
