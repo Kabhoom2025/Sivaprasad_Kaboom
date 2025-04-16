@@ -145,7 +145,8 @@ namespace Kaboom.Services
                     UserName = user.UserName,
                     PasswordHash = user.PasswordHash,
                     Role = "User",
-                    ProfileImageUrl = user.ProfileImageUrl
+                    ProfileImageUrl = user.ProfileImageUrl,
+                    AdminId = user.AdminId
                 };
 
                 _context.Users.Add(newUser);
@@ -174,6 +175,7 @@ namespace Kaboom.Services
             if (existing != null)
             {
                 existing.IsEnabled = preferences.IsEnabled;
+                existing.UpdatedAt = DateTime.UtcNow;
                 _context.SaveChanges();
                 return existing;
             }
@@ -184,14 +186,70 @@ namespace Kaboom.Services
                 return preferences;
             }
         }
-        public PreferenceToggle GetFeature()
+        public List<PreferenceToggle> GetFeature()
         {
             var feature = _context.PreferenceToggle.ToList();
             if (feature == null)
             {
                 throw new Exception("No Feature Found");
             }
-            return feature.FirstOrDefault();
+            return feature;
+        }
+
+        public Users RegisterUserFromAdmin(Users user, int adminId)
+        {
+            if(_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.Sqlserver)
+            {
+                // Check if user already exists
+                var existingUser = _context.Users.FirstOrDefault(x => x.UserEmail == user.UserEmail);
+                if (existingUser != null)
+                {
+                    throw new Exception("Email already exists");
+                }
+                // Hash the password before saving
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
+                // Determine role (default to User if not provided)
+                string userRole = string.IsNullOrEmpty(user.Role) ? "User" : user.Role;
+                // Create a corresponding AuthUser entry
+                var auth = new AuthUser
+                {
+                    Name = user.UserName,
+                    Email = user.UserEmail,
+                    PasswordHash = user.PasswordHash,
+                    Role = "User",  // Admin or User
+                    ProfileImageUrl = user.ProfileImageUrl
+                };
+                _context.AuthUser.Add(auth);
+                _context.SaveChanges();
+                // Now create an entry in Users table
+                var newUser = new Users
+                {
+                    UserEmail = user.UserEmail,
+                    UserName = user.UserName,
+                    PasswordHash = user.PasswordHash,
+                    Role = "User",
+                    ProfileImageUrl = user.ProfileImageUrl,
+                    AdminId = user.AdminId
+                };
+                _context.Users.Add(newUser);
+                _context.SaveChanges();
+                return newUser;
+            }
+            else if (_dataBaseService.GetCurrentDatabaseProvider() == DatabaseProviders.MongoDb)
+            {
+                var collection = _mongodatabase.GetCollection<Users>("Users");
+                var existing = collection.Find(u => u.UserEmail == user.UserEmail).FirstOrDefault();
+                if (existing != null)
+                    throw new Exception("User already exists");
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
+                collection.InsertOne(user);
+                return user;
+            }
+            return user;
+        }
+        public List<Users> GetUsersForAdmin(int adminId)
+        {
+            return _context.Users.Where(u => u.AdminId == adminId).ToList();
         }
     }
 }

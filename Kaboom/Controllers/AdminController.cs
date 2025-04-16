@@ -1,6 +1,7 @@
 ﻿using Kaboom.Interfaces;
 using Kaboom.Models;
 using Kaboom.Models.Admin;
+using Kaboom.Models.AuthUserModel;
 using Kaboom.Models.Features;
 using Kaboom.Models.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -134,6 +135,24 @@ namespace Kaboom.Controllers
             if (data == null)
                 return NotFound("Feature not Found");
             return Ok(data);
+        }
+        [HttpGet("{adminId}/users")]
+        public IActionResult GetUsersForAdmin(int adminId)
+        {
+            var data = _adminService.GetUsersForAdmin(adminId);
+            if (data == null)
+                return NotFound("No Users Found under this Admin");
+            return Ok(data);
+        }
+        [HttpPost("{adminId}/register-user")]
+        public IActionResult RegisterUserFromAdmin(int adminId, [FromBody] Users user)
+        {
+            if(user == null)
+            {
+                return BadRequest("User data is null");
+            }
+            var createuser = _adminService.RegisterUserFromAdmin(user, adminId);
+            return CreatedAtAction(nameof(RegisterUserFromAdmin), new { id = createuser.AdminId }, createuser);
         }
 
     }

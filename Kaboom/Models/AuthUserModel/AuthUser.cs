@@ -13,6 +13,7 @@ namespace Kaboom.Models.AuthUserModel
         public List<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
         public string? ProfileImageUrl { get; set; } // Profile image
         public string? PlainTextPassword { get; set; }
+        public int AdminId { get; set; }
     }
     public class RefreshToken
     {

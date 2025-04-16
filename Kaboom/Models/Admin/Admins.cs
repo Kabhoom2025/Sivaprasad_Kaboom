@@ -1,4 +1,6 @@
-﻿namespace Kaboom.Models.Admin
+﻿using Kaboom.Models.Users;
+
+namespace Kaboom.Models.Admin
 {
     public class Admins
     {
@@ -8,5 +10,6 @@
         public string Role { get; set; }
         public string? PasswordHash { get; set; } //Hashed Password
         public string ProfileImageUrl { get; set; } // Admin profile image
+        public ICollection<Users.Users> Users { get; set; } = new List<Users.Users>();
     }
 }

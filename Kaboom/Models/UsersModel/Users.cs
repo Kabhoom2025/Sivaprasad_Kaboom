@@ -1,4 +1,7 @@
-﻿namespace Kaboom.Models.Users
+﻿using System.Text.Json.Serialization;
+using Kaboom.Models.Admin;
+
+namespace Kaboom.Models.Users
 {
     public class Users
     {
@@ -8,6 +11,8 @@
         public string PasswordHash { get; set; } // Hashed Password
         public string Role { get; set; }   // "User" or "Admin"
         public string ProfileImageUrl { get; set; } //User profile Image
-                                                    // public List<Orders> orders { get; set; } = new List<Orders>();
+        public int AdminId { get; set; }
+        [JsonIgnore]
+        public Admins? Admin { get; set; }
     }
 }

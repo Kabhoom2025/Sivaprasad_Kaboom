@@ -19,6 +19,8 @@ namespace Kaboom.Interfaces
         public Users RegisterUserFromAdmin(Users user);
         public List<Admins> GetAllAdmins();
         public PreferenceToggle SetFeature(PreferenceToggle preferences);
-        public PreferenceToggle GetFeature();
+        public List<PreferenceToggle> GetFeature();
+        public Users RegisterUserFromAdmin(Users user, int adminId);
+        public List<Users> GetUsersForAdmin(int adminId);
     }
 }

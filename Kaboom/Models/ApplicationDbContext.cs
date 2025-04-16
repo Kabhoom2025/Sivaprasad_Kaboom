@@ -4,6 +4,7 @@ using Kaboom.Models.Features;
 using Kaboom.Models.Order;
 using Kaboom.Models.product;
 using Kaboom.Models.StockModel;
+using Kaboom.Models.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kaboom.Models
@@ -27,7 +28,11 @@ namespace Kaboom.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
+            modelBuilder.Entity<Users.Users>()
+            .HasOne(u => u.Admin)
+            .WithMany(a => a.Users)
+            .HasForeignKey(u => u.AdminId)
+            .OnDelete(DeleteBehavior.Cascade);
             // Define relationships
             modelBuilder.Entity<Orders>()
                 .HasMany(o => o.OrderItems)

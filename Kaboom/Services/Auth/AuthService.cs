@@ -81,7 +81,19 @@ namespace Kaboom.Services.Auth
             AuthUser user = null;
             if (provider == DatabaseProviders.Sqlserver)
             {
-                user = _context.Set<AuthUser>().FirstOrDefault(x => x.Email == email);
+                user = _context.AuthUser.Where(x => x.Email == email).Select(x => new AuthUser { 
+                    Id = x.Id ,
+                    Name = x.Name,
+                    Email = x.Email,
+                    PasswordHash = x.PasswordHash,
+                    Salt = x.Salt,
+                    Role = x.Role,
+                    ProfileImageUrl = x.ProfileImageUrl,
+                    RefreshTokens = x.RefreshTokens
+                
+
+            }).FirstOrDefault();
+                
             }
             else if (provider == DatabaseProviders.MongoDb)
             {
@@ -125,7 +137,7 @@ namespace Kaboom.Services.Auth
             AuthUser existingUser = null;
             if (provider == DatabaseProviders.Sqlserver)
             {
-                existingUser = _context.AuthUser.FirstOrDefault(x => x.Email == user.Email);
+                existingUser = _context.AuthUser.Where(x => x.Email == user.Email).Select(x => new AuthUser { Id = x.Id }).FirstOrDefault(); 
                 if (existingUser != null)
                 {
                     throw new InvalidOperationException("Email is already in use. Please use a different email.");
@@ -159,7 +171,8 @@ namespace Kaboom.Services.Auth
                             UserName = user.Name,
                             PasswordHash = hashedpassword,
                             Role = "User",
-                            ProfileImageUrl = user.ProfileImageUrl
+                            ProfileImageUrl = user.ProfileImageUrl,
+                            AdminId = user.AdminId
                         };
                         _context.Users.Add(newUser);
                         _context.SaveChanges();
@@ -237,7 +250,18 @@ namespace Kaboom.Services.Auth
 
             if (provider == DatabaseProviders.Sqlserver)
             {
-                return _context.AuthUser.Where(x => x.Email == email).FirstOrDefault();
+                return _context.AuthUser.Where(x => x.Email == email).Select(x => new AuthUser
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Email = x.Email,
+                    PasswordHash = x.PasswordHash,
+                    Salt = x.Salt,
+                    Role = x.Role,
+                    ProfileImageUrl = x.ProfileImageUrl,
+                    RefreshTokens = x.RefreshTokens
+                }).FirstOrDefault();
+
             }
             else if (provider == DatabaseProviders.MongoDb)
             {
