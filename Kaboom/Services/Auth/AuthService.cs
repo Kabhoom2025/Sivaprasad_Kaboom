@@ -19,12 +19,15 @@ namespace Kaboom.Services.Auth
         private readonly IMongoDatabase _mongodatabase;
         private IConfiguration _configuration;
         private readonly IDataBaseService _dataBaseService;
-        public AuthService(ApplicationDbContext context, IMongoClient mongoClient, IConfiguration configuration, IDataBaseService dataBaseService)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public AuthService(ApplicationDbContext context, IMongoClient mongoClient, IConfiguration configuration,
+            IDataBaseService dataBaseService, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _mongodatabase = mongoClient.GetDatabase("MongoDbConnection");
             _configuration = configuration;
             _dataBaseService = dataBaseService;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public string GenerateJWTtoken(AuthUser user)
@@ -81,8 +84,9 @@ namespace Kaboom.Services.Auth
             AuthUser user = null;
             if (provider == DatabaseProviders.Sqlserver)
             {
-                user = _context.AuthUser.Where(x => x.Email == email).Select(x => new AuthUser { 
-                    Id = x.Id ,
+                user = _context.AuthUser.Where(x => x.Email == email).Select(x => new AuthUser
+                {
+                    Id = x.Id,
                     Name = x.Name,
                     Email = x.Email,
                     PasswordHash = x.PasswordHash,
@@ -90,10 +94,10 @@ namespace Kaboom.Services.Auth
                     Role = x.Role,
                     ProfileImageUrl = x.ProfileImageUrl,
                     RefreshTokens = x.RefreshTokens
-                
 
-            }).FirstOrDefault();
-                
+
+                }).FirstOrDefault();
+
             }
             else if (provider == DatabaseProviders.MongoDb)
             {
@@ -133,11 +137,20 @@ namespace Kaboom.Services.Auth
             user.PasswordHash = hashedpassword;
             user.Salt = salt;
             user.PlainTextPassword = password;
+            // Save image
+            //if (imageFile != null)
+            //{
+            //    var result = SaveImage(imageFile);
+            //    if (result.Item1 == 1)
+            //    {
+            //        user.ProfileImageUrl = result.Item2;
+            //    }
+            //}
             string provider = _dataBaseService.GetCurrentDatabaseProvider();
             AuthUser existingUser = null;
             if (provider == DatabaseProviders.Sqlserver)
             {
-                existingUser = _context.AuthUser.Where(x => x.Email == user.Email).Select(x => new AuthUser { Id = x.Id }).FirstOrDefault(); 
+                existingUser = _context.AuthUser.Where(x => x.Email == user.Email).Select(x => new AuthUser { Id = x.Id }).FirstOrDefault();
                 if (existingUser != null)
                 {
                     throw new InvalidOperationException("Email is already in use. Please use a different email.");
@@ -383,6 +396,38 @@ namespace Kaboom.Services.Auth
             _context.AuthUser.RemoveRange(users);
             _context.SaveChanges();
             return true;
+        }
+        private Tuple<int, string> SaveImage(IFormFile imageFile)
+        {
+            try
+            {
+                var contentpath = _webHostEnvironment.ContentRootPath;
+                var imagepath = Path.Combine(contentpath, "Uploads");
+                if (!Directory.Exists(imagepath))
+                {
+                    Directory.CreateDirectory(imagepath);
+                }
+                var ext = Path.GetExtension(imageFile.FileName);
+                var allowextensions = new string[] { ".jpg", ".jpeg", ".png", ".gif" };
+                if (!allowextensions.Contains(ext))
+                {
+                    throw new Exception("Invalid file type");
+                }
+                string uniquestring  = Guid.NewGuid().ToString();
+                var filename = uniquestring + ext;
+                var fullpath = Path.Combine(imagepath, filename);
+                using (var stream = new FileStream(fullpath, FileMode.Create))
+                {
+                    imageFile.CopyTo(stream);
+                    stream.Close();
+                }
+                return new Tuple<int, string>(1, filename);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error saving image: " + ex.Message);
+            }
         }
     }
 }

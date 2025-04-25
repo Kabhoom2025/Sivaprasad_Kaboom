@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Kaboom.Models.AuthUserModel
 {
@@ -12,6 +13,8 @@ namespace Kaboom.Models.AuthUserModel
         public string? Role { get; set; }
         public List<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
         public string? ProfileImageUrl { get; set; } // Profile image
+        [NotMapped]
+        public IFormFile ImageFile { get; set; } // For uploading image
         public string? PlainTextPassword { get; set; }
         public int AdminId { get; set; }
     }

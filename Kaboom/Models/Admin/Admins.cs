@@ -1,4 +1,5 @@
-﻿using Kaboom.Models.Users;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Kaboom.Models.Users;
 
 namespace Kaboom.Models.Admin
 {
@@ -10,6 +11,8 @@ namespace Kaboom.Models.Admin
         public string Role { get; set; }
         public string? PasswordHash { get; set; } //Hashed Password
         public string ProfileImageUrl { get; set; } // Admin profile image
+        [NotMapped]
+        public IFormFile ImageFile { get; set; } // For uploading image
         public ICollection<Users.Users> Users { get; set; } = new List<Users.Users>();
     }
 }
