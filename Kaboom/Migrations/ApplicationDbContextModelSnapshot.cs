@@ -62,6 +62,9 @@ namespace Kaboom.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AdminId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
@@ -115,6 +118,28 @@ namespace Kaboom.Migrations
                     b.ToTable("RefreshToken");
                 });
 
+            modelBuilder.Entity("Kaboom.Models.Features.PreferenceToggle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FeatureKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PreferenceToggle");
+                });
+
             modelBuilder.Entity("Kaboom.Models.Order.OrderItems", b =>
                 {
                     b.Property<int>("Id")
@@ -155,26 +180,16 @@ namespace Kaboom.Migrations
                     b.Property<int?>("AdminId")
                         .HasColumnType("int");
 
-                    b.Property<int>("AdminsId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsersId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AdminsId");
-
-                    b.HasIndex("UsersId");
 
                     b.ToTable("Orders");
                 });
@@ -193,15 +208,12 @@ namespace Kaboom.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductsId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductsId");
+                    b.HasIndex("ProductId");
 
                     b.ToTable("Stocks");
                 });
@@ -213,6 +225,9 @@ namespace Kaboom.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AdminId")
+                        .HasColumnType("int");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -235,6 +250,8 @@ namespace Kaboom.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AdminId");
 
                     b.ToTable("Users");
                 });
@@ -300,34 +317,31 @@ namespace Kaboom.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Kaboom.Models.Order.Orders", b =>
-                {
-                    b.HasOne("Kaboom.Models.Admin.Admins", "Admins")
-                        .WithMany()
-                        .HasForeignKey("AdminsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Kaboom.Models.Users.Users", "Users")
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Admins");
-
-                    b.Navigation("Users");
-                });
-
             modelBuilder.Entity("Kaboom.Models.StockModel.Stocks", b =>
                 {
                     b.HasOne("Kaboom.Models.product.Products", "Products")
                         .WithMany()
-                        .HasForeignKey("ProductsId")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("Kaboom.Models.Users.Users", b =>
+                {
+                    b.HasOne("Kaboom.Models.Admin.Admins", "Admin")
+                        .WithMany("Users")
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Admin");
+                });
+
+            modelBuilder.Entity("Kaboom.Models.Admin.Admins", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Kaboom.Models.AuthUserModel.AuthUser", b =>
